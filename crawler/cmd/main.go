@@ -15,6 +15,8 @@ import (
 var Version string
 
 type Options struct {
+	flag.Options
+
 	Directory    string `dft:"data"`
 	Parallel     int    `dft:"100"`
 	MaxDepth     int    `dft:"4"`
@@ -24,36 +26,35 @@ type Options struct {
 	StartPage    string
 }
 
+func Must(err error) {
+	if err != nil {
+		panic(err)
+	}
+}
+
 func main() {
 	var options Options
-	help := flag.Bool("help", false, "show help info")
-	version := flag.Bool("version", false, "show version")
-	configPath := flag.String("configPath", "config/crrawler.json", "config path")
-	if *help {
+
+	Must(flag.Struct(&options))
+	Must(flag.Parse())
+	if options.Help {
 		fmt.Println(flag.Usage())
 		return
 	}
-	if *version {
+	if options.Version {
 		fmt.Println(Version)
 		return
 	}
-	if err := flag.Struct(&options); err != nil {
-		panic(err)
-	}
-	if err := flag.Parse(); err != nil {
-		panic(err)
-	}
 	var cfg *config.Config
-	if *configPath != "" {
+	if options.ConfigPath != "" {
 		var err error
-		cfg, err = config.NewSimpleFileConfig(*configPath)
+		cfg, err = config.NewSimpleFileConfig(options.ConfigPath)
 		if err != nil {
 			panic(err)
 		}
 	}
-	if err := binding.Bind(&options, flag.Instance(), binding.NewEnvGetter(), cfg); err != nil {
-		panic(err)
-	}
+
+	Must(binding.Bind(&options, flag.Instance(), binding.NewEnvGetter(), cfg))
 
 	c := colly.NewCollector(
 		//colly.Async(),
