@@ -37,7 +37,7 @@ type BookAnalyst struct {
 }
 
 type BookMeta struct {
-	Name    string
+	Source  string
 	Title   string
 	Dynasty string
 	Author  string
@@ -45,6 +45,7 @@ type BookMeta struct {
 }
 
 type BookSection struct {
+	Source  string
 	Index   int
 	Section string
 	Content string
@@ -110,7 +111,7 @@ func (a *BookAnalyst) AnalystBookMeta(bookName string) (*BookMeta, error) {
 	}
 
 	return &BookMeta{
-		Name:    bookName,
+		Source:  fmt.Sprintf("/book/%v.html", bookName),
 		Title:   strings.Trim(strings.Trim(strex.FormatSpace(doc.Find("#main_left > div > h1").Text()), "《"), "》"),
 		Dynasty: strex.FormatSpace(doc.Find("#main_left > div > div:nth-child(2) > p:nth-child(2)").Text()),
 		Author:  strex.FormatSpace(doc.Find("#main_left > div > div:nth-child(2) > p:nth-child(3)").Text()),
@@ -169,6 +170,7 @@ func (a *BookAnalyst) AnalystBookSection(bookName string, section string) (*Book
 		return nil, err
 	}
 	return &BookSection{
+		Source:  fmt.Sprintf("/book/%v/%v", bookName, section),
 		Index:   idx,
 		Section: strex.FormatSpace(doc.Find("#main_left > div.card.bookmark-list > h1").Text()),
 		Content: buf.String(),

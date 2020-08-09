@@ -34,6 +34,7 @@ type ShiCiAnalyst struct {
 }
 
 type ShiCi struct {
+	Source        string
 	Title         string
 	Author        string
 	Dynasty       string
@@ -82,8 +83,8 @@ func (a *ShiCiAnalyst) Analyst() ([]*ShiCi, error) {
 	return shiCis, nil
 }
 
-func (a *ShiCiAnalyst) AnalystShiCi(filename string) (*ShiCi, error) {
-	fp, err := os.Open(fmt.Sprintf("%v/chaxun/list/%v", a.Root, filename))
+func (a *ShiCiAnalyst) AnalystShiCi(source string) (*ShiCi, error) {
+	fp, err := os.Open(fmt.Sprintf("%v/chaxun/list/%v", a.Root, source))
 	if err != nil {
 		return nil, err
 	}
@@ -106,6 +107,7 @@ func (a *ShiCiAnalyst) AnalystShiCi(filename string) (*ShiCi, error) {
 	dynastyAuthor := strings.TrimSpace(doc.Find("#item_div > div.niandai_zuozhe").Text())
 
 	return &ShiCi{
+		Source:        fmt.Sprintf("/chaxun/list/%v", source),
 		Title:         doc.Find("#zs_title").Text(),
 		Author:        strings.Join(strings.Split(dynastyAuthor, " ")[1:], " "),
 		DynastyAuthor: dynastyAuthor,
