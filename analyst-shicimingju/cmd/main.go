@@ -8,7 +8,7 @@ import (
 	"github.com/hatlonely/go-kit/flag"
 	"github.com/hatlonely/go-kit/strex"
 
-	"github.com/hatlonely/go-crawler/shicimingju/internal/shicimingju"
+	"github.com/hatlonely/go-crawler/analyst-shicimingju/internal/shicimingju"
 )
 
 var Version string
