@@ -37,11 +37,12 @@ type BookAnalyst struct {
 }
 
 type BookMeta struct {
-	Source  string
-	Title   string
-	Dynasty string
-	Author  string
-	Brief   string
+	Source        string
+	Title         string
+	Dynasty       string
+	Author        string
+	Brief         string
+	DynastyAuthor string
 }
 
 type BookSection struct {
@@ -111,11 +112,12 @@ func (a *BookAnalyst) AnalystBookMeta(bookName string) (*BookMeta, error) {
 	}
 
 	return &BookMeta{
-		Source:  fmt.Sprintf("/book/%v.html", bookName),
-		Title:   strings.Trim(strings.Trim(strex.FormatSpace(doc.Find("#main_left > div > h1").Text()), "《"), "》"),
-		Dynasty: strex.FormatSpace(doc.Find("#main_left > div > div:nth-child(2) > p:nth-child(2)").Text()),
-		Author:  strex.FormatSpace(doc.Find("#main_left > div > div:nth-child(2) > p:nth-child(3)").Text()),
-		Brief:   strex.FormatSpace(doc.Find("#main_left > div > div:nth-child(2) > p.des").Text()),
+		Source:        fmt.Sprintf("/book/%v.html", bookName),
+		Title:         strings.Trim(strings.Trim(strex.FormatSpace(doc.Find("#main_left > div > h1").Text()), "《"), "》"),
+		Dynasty:       strex.FormatSpace(doc.Find("#main_left > div > div:nth-child(2) > p:nth-child(2)").Text()),
+		Author:        strex.FormatSpace(doc.Find("#main_left > div > div:nth-child(2) > p:nth-child(3)").Text()),
+		Brief:         strex.FormatSpace(doc.Find("#main_left > div > div:nth-child(2) > p.des").Text()),
+		DynastyAuthor: doc.Find("#main_left > div > div:nth-child(2) > p:nth-child(1)").Text(),
 	}, nil
 }
 

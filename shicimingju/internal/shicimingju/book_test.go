@@ -11,7 +11,7 @@ import (
 func TestBookAnalyst(t *testing.T) {
 	Convey("TestBookAnalyst", t, func() {
 		a := NewBookAnalyst("/Users/hatlonely/hatlonely/github.com/hatlonely/go-crawler/data/www.shicimingju.com", "")
-		bookName := "chanshu"
+		bookName := "sanguoyanyi"
 		{
 			meta, err := a.AnalystBookMeta(bookName)
 			So(err, ShouldBeNil)
