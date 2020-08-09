@@ -12,7 +12,7 @@ import (
 
 	"github.com/PuerkitoBio/goquery"
 
-	"github.com/hatlonely/go-rpc/crawler/pkg/strex"
+	"github.com/hatlonely/go-crawler/crawler/pkg/strex"
 )
 
 func NewBookAnalyst(root string) *BookAnalyst {
