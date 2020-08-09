@@ -12,8 +12,7 @@ import (
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
-
-	"github.com/hatlonely/go-crawler/shicimingju/pkg/strex"
+	"github.com/hatlonely/go-kit/strex"
 )
 
 type BookOptions struct {
