@@ -37,19 +37,19 @@ type BookAnalyst struct {
 }
 
 type BookMeta struct {
-	Source        string
-	Title         string
-	Dynasty       string
-	Author        string
-	Brief         string
-	DynastyAuthor string
+	Source        string `json:"source"`
+	Title         string `json:"title"`
+	Dynasty       string `json:"dynasty"`
+	Author        string `json:"author"`
+	Brief         string `json:"brief"`
+	DynastyAuthor string `json:"dynastyAuthor"`
 }
 
 type BookSection struct {
-	Source  string
-	Index   int
-	Section string
-	Content string
+	Source  string `json:"source"`
+	Index   int    `json:"index"`
+	Section string `json:"section"`
+	Content string `json:"content"`
 }
 
 type Book struct {

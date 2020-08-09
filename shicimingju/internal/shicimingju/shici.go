@@ -34,12 +34,12 @@ type ShiCiAnalyst struct {
 }
 
 type ShiCi struct {
-	Source        string
-	Title         string
-	Author        string
-	Dynasty       string
-	Content       string
-	DynastyAuthor string
+	Source        string `json:"source"`
+	Title         string `json:"title"`
+	Author        string `json:"author"`
+	Dynasty       string `json:"dynasty"`
+	Content       string `json:"content"`
+	DynastyAuthor string `json:"dynastyAuthor"`
 }
 
 func (a *ShiCiAnalyst) AnalystAndSaveResult() error {
