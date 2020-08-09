@@ -15,7 +15,8 @@ var Version string
 
 type Options struct {
 	flag.Options
-	Book shicimingju.BookOptions
+	Book  shicimingju.BookOptions
+	ShiCi shicimingju.ShiCiOptions
 }
 
 func Must(err error) {
@@ -48,6 +49,6 @@ func main() {
 	Must(binding.Bind(&options, flag.Instance(), binding.NewEnvGetter(), cfg))
 	fmt.Println(strex.MustJsonMarshal(options))
 
-	a := shicimingju.NewBookAnalystWithOptions(&options.Book)
-	Must(a.AnalystAndSaveResult())
+	Must(shicimingju.NewBookAnalystWithOptions(&options.Book).AnalystAndSaveResult())
+	Must(shicimingju.NewShiCiAnalystWithOptions(&options.ShiCi).AnalystAndSaveResult())
 }

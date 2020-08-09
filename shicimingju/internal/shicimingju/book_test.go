@@ -10,7 +10,7 @@ import (
 
 func TestBookAnalyst(t *testing.T) {
 	Convey("TestBookAnalyst", t, func() {
-		a := NewBookAnalyst("/Users/hatlonely/hatlonely/github.com/hatlonely/go-crawler/crawler/data/www.shicimingju.com", "")
+		a := NewBookAnalyst("/Users/hatlonely/hatlonely/github.com/hatlonely/go-crawler/data/www.shicimingju.com", "")
 		bookName := "chanshu"
 		{
 			meta, err := a.AnalystBookMeta(bookName)
