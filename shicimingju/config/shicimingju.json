@@ -1,0 +1,6 @@
+{
+  "book": {
+    "root": "/Users/hatlonely/hatlonely/github.com/hatlonely/go-crawler/crawler/data/www.shicimingju.com",
+    "out": "book.json"
+  }
+}

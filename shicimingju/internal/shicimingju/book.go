@@ -3,6 +3,7 @@ package shicimingju
 import (
 	"bufio"
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -12,17 +13,28 @@ import (
 
 	"github.com/PuerkitoBio/goquery"
 
-	"github.com/hatlonely/go-crawler/www.shicimingju.com/pkg/strex"
+	"github.com/hatlonely/go-crawler/shicimingju/pkg/strex"
 )
 
-func NewBookAnalyst(root string) *BookAnalyst {
+type BookOptions struct {
+	Root string
+	Out  string
+}
+
+func NewBookAnalystWithOptions(options *BookOptions) *BookAnalyst {
+	return NewBookAnalyst(options.Root, options.Out)
+}
+
+func NewBookAnalyst(root string, out string) *BookAnalyst {
 	return &BookAnalyst{
 		Root: root,
+		Out:  out,
 	}
 }
 
 type BookAnalyst struct {
 	Root string
+	Out  string
 }
 
 type BookMeta struct {
@@ -42,6 +54,26 @@ type BookSection struct {
 type Book struct {
 	Meta     *BookMeta
 	Sections []*BookSection
+}
+
+func (a *BookAnalyst) AnalystAndSaveResult() error {
+	fp, err := os.Create(a.Out)
+	if err != nil {
+		return err
+	}
+	w := bufio.NewWriter(fp)
+
+	books, err := a.Analyst()
+	if err != nil {
+		return err
+	}
+	for _, book := range books {
+		buf, _ := json.Marshal(book)
+		_, _ = w.Write(buf)
+		_, _ = w.WriteString("\n")
+	}
+	_ = w.Flush()
+	return nil
 }
 
 func (a *BookAnalyst) Analyst() ([]*Book, error) {
@@ -124,12 +156,13 @@ func (a *BookAnalyst) AnalystBookSection(bookName string, section string) (*Book
 
 	buf := bytes.Buffer{}
 	doc.Find("#main_left > div.card.bookmark-list > div > p").Each(func(i int, s *goquery.Selection) {
-		text := strings.TrimSpace(s.Text())
-		if text == "" {
-			return
-		}
-		buf.WriteString(text)
-		buf.WriteString("\n")
+		s.Contents().Each(func(i int, s *goquery.Selection) {
+			text := strings.TrimSpace(s.Text())
+			buf.WriteString(text)
+			if !s.Is("br") {
+				buf.WriteString("\n")
+			}
+		})
 	})
 
 	idx, err := strconv.Atoi(strings.Split(section, ".")[0])
