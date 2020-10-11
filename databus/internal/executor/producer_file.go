@@ -3,6 +3,8 @@ package executor
 import (
 	"bufio"
 	"encoding/json"
+	"fmt"
+	"io"
 	"os"
 
 	"github.com/pkg/errors"
@@ -17,19 +19,34 @@ func NewFileProducer(filename string) *FileProducer {
 }
 
 func (p *FileProducer) Produce(vals chan<- interface{}, errs chan<- error) {
-	fp, err := os.Open(p.filename)
-	if err != nil {
-		panic(err)
+	var fp *os.File
+	if p.filename == "stdin" {
+		fp = os.Stdin
+	} else {
+		var err error
+		fp, err = os.Open(p.filename)
+		if err != nil {
+			panic(err)
+		}
 	}
-	scanner := bufio.NewScanner(fp)
-	line := 0
-	for scanner.Scan() {
-		line++
+	defer fp.Close()
+	reader := bufio.NewReader(fp)
+	count := 0
+	for {
+		count++
 		v := map[string]interface{}{}
-		if err := json.Unmarshal(scanner.Bytes(), &v); err != nil {
-			errs <- errors.WithMessagef(err, "json.Unmarshal failed, line: [%v]", line)
+		line, err := reader.ReadBytes('\n')
+		if err != nil {
+			if err != io.EOF {
+				errs <- errors.Wrapf(err, "bufio.Reader.ReadBytes failed")
+			}
+			break
+		}
+		if err := json.Unmarshal(line, &v); err != nil {
+			errs <- errors.Wrapf(err, "json.Unmarshal failed, line: [%v]", count)
 			continue
 		}
-		vals <- scanner.Bytes()
+		vals <- v
 	}
+	fmt.Println("produce done", count)
 }

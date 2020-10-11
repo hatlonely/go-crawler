@@ -1,6 +1,7 @@
 package executor
 
 import (
+	"fmt"
 	"sync"
 )
 
@@ -13,8 +14,15 @@ type Executor struct {
 }
 
 func NewExecutor(producer Producer, consumer Consumer, parallel int) *Executor {
-	ch := make(chan interface{}, parallel)
-	return &Executor{vals: ch, parallel: parallel, producer: producer, consumer: consumer}
+	vals := make(chan interface{}, parallel)
+	errs := make(chan error, parallel)
+	return &Executor{
+		vals:     vals,
+		errs:     errs,
+		parallel: parallel,
+		producer: producer,
+		consumer: consumer,
+	}
 }
 
 func (e *Executor) Execute() {
@@ -27,9 +35,16 @@ func (e *Executor) Execute() {
 	for i := 0; i < e.parallel; i++ {
 		wg.Add(1)
 		go func() {
-			e.consumer.Consume(e.vals)
+			e.consumer.Consume(e.vals, e.errs)
 			wg.Done()
 		}()
 	}
+	wg.Add(1)
+	go func() {
+		for err := range e.errs {
+			fmt.Println(err)
+		}
+		wg.Done()
+	}()
 	wg.Wait()
 }

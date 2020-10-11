@@ -1,0 +1,11 @@
+{
+  "producer": {
+    "type": "file",
+    "filename": "stdin"
+  },
+  "consumer": {
+    "type": "file",
+    "filename": "stdout"
+  },
+  "parallel": 1
+}
