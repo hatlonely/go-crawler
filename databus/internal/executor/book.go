@@ -1,9 +1,6 @@
-package shicimingju
+package executor
 
 import (
-	"bufio"
-	"os"
-
 	"github.com/jinzhu/gorm"
 )
 
@@ -15,34 +12,11 @@ type ShiCi struct {
 	Content string `gorm:"type:longtext COLLATE utf8mb4_unicode_520_ci;not null" json:"content,omitempty"`
 }
 
-type ShiCiStorage struct {
-	mysqlCli *gorm.DB
-	in       string
-	ch       chan *ShiCi
-	parallel int
-}
-
-func NewShiCiStorage(mysqlCli *gorm.DB, in string, parallel int) (*ShiCiStorage, error) {
+func CreateTables(mysqlCli *gorm.DB) error {
 	if !mysqlCli.HasTable(&ShiCi{}) {
 		if err := mysqlCli.Set("gorm:table_options", "ENGINE=InnoDB DEFAULT CHARSET=utf8").CreateTable(&ShiCi{}).Error; err != nil {
-			return nil, err
+			return err
 		}
 	}
-	return &ShiCiStorage{
-		mysqlCli: mysqlCli,
-		in:       in,
-		ch:       make(chan *ShiCi, parallel),
-		parallel: parallel,
-	}, nil
-}
-
-func (s *ShiCiStorage) Producer() {
-	fp, err := os.Open(s.in)
-	if err != nil {
-		panic(err)
-	}
-	scanner := bufio.NewScanner(fp)
-	for scanner.Scan() {
-		//shiCi := &ShiCi{}
-	}
+	return nil
 }
