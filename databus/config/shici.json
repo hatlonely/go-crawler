@@ -1,0 +1,25 @@
+{
+  "producer": {
+    "type": "file",
+    "filename": "stdin"
+  },
+  "consumer": {
+    "type": "mysql",
+    "mysql": {
+      "username": "root",
+      "password": "",
+      "database": "ancient",
+      "host": "127.0.0.1",
+      "port": 3306,
+      "connMaxLifeTime": "60s",
+      "maxIdleConns": 10,
+      "maxOpenConns": 20
+    },
+    "table": "shici",
+    "fields": ["id", "title", "author", "dynasty", "content"],
+    "keyMap": {
+      "id": "@lineno"
+    }
+  },
+  "parallel": 1
+}
