@@ -3,7 +3,6 @@ package executor
 import (
 	"bufio"
 	"encoding/json"
-	"fmt"
 	"os"
 
 	"github.com/pkg/errors"
@@ -42,5 +41,4 @@ func (c *FileConsumer) Consume(vals <-chan interface{}, errs chan<- error) {
 		}
 		_ = writer.Flush()
 	}
-	fmt.Println("consume done")
 }

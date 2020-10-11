@@ -3,7 +3,6 @@ package executor
 import (
 	"bufio"
 	"encoding/json"
-	"fmt"
 	"io"
 	"os"
 
@@ -48,5 +47,4 @@ func (p *FileProducer) Produce(vals chan<- interface{}, errs chan<- error) {
 		}
 		vals <- v
 	}
-	fmt.Println("produce done", count)
 }
