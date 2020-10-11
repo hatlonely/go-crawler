@@ -34,6 +34,7 @@ cleandockerenv:
 
 .PHONY: image
 image: dockerenv
+	rm -rf docker
 	docker exec go-build-env rm -rf /data/src/${gituser}/${repository}
 	docker exec go-build-env mkdir -p /data/src/${gituser}/${repository}/crawler
 	docker cp ../scripts go-build-env:/data/src/${gituser}/${repository}
