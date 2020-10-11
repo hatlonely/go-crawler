@@ -12,6 +12,10 @@ type ShiCi struct {
 	Content string `gorm:"type:longtext COLLATE utf8mb4_unicode_520_ci;not null" json:"content,omitempty"`
 }
 
+func (ShiCi) TableName() string {
+	return "shici"
+}
+
 func CreateTables(mysqlCli *gorm.DB) error {
 	if !mysqlCli.HasTable(&ShiCi{}) {
 		if err := mysqlCli.Set("gorm:table_options", "ENGINE=InnoDB DEFAULT CHARSET=utf8").CreateTable(&ShiCi{}).Error; err != nil {
