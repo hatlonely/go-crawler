@@ -1,4 +1,4 @@
-binary=ancient
+binary=crawler
 export GOPROXY=https://goproxy.io
 
 .PHONY: build
