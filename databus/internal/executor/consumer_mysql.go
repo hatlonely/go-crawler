@@ -7,6 +7,7 @@ import (
 
 	"github.com/hatlonely/go-kit/cli"
 	"github.com/hatlonely/go-kit/config"
+	"github.com/hatlonely/go-kit/refex"
 	"github.com/jinzhu/gorm"
 	"github.com/pkg/errors"
 )
@@ -32,7 +33,7 @@ func NewMysqlConsumerWithConfig(cfg *config.Config) (*MysqlConsumer, error) {
 		return nil, err
 	}
 	options := &MysqlConsumerOptions{}
-	if err := cfg.Unmarshal(options); err != nil {
+	if err := cfg.Unmarshal(options, refex.WithCamelName()); err != nil {
 		return nil, err
 	}
 	return NewMysqlConsumerWithOptions(mysqlCli, options)
@@ -53,7 +54,7 @@ func NewMysqlConsumerWithOptions(mysqlCli *gorm.DB, options *MysqlConsumerOption
 		buf1.WriteByte('`')
 		buf1.WriteByte(',')
 
-		buf2.WriteString("%v,")
+		buf2.WriteString("?,")
 	}
 
 	sql := fmt.Sprintf(
@@ -61,6 +62,7 @@ func NewMysqlConsumerWithOptions(mysqlCli *gorm.DB, options *MysqlConsumerOption
 		strings.TrimRight(buf1.String(), ","),
 		strings.TrimRight(buf2.String(), ","),
 	)
+	fmt.Println(sql)
 
 	return &MysqlConsumer{
 		mysqlCli: mysqlCli,
@@ -84,7 +86,7 @@ func (c *MysqlConsumer) Consume(vals <-chan interface{}, errs chan<- error) {
 		kvs := val.(map[string]interface{})
 		var vs []interface{}
 		for _, field := range c.fields {
-			vs = append(vs, kvs[field])
+			vs = append(vs, kvs[c.keyMap[field]])
 		}
 		if err := c.mysqlCli.Exec(c.sql, vs...).Error; err != nil {
 			errs <- errors.WithMessagef(err, "gorm.DB.Exec failed")

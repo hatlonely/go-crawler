@@ -98,8 +98,8 @@ github.com/google/go-cmp v0.5.0/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/
 github.com/google/gofuzz v1.0.0/go.mod h1:dBl0BpW6vV/+mYPU4Po3pmUjxk6FQPldtuIdl/M65Eg=
 github.com/gopherjs/gopherjs v0.0.0-20181017120253-0766667cb4d1 h1:EGx4pi6eqNxGaHF6qqu48+N2wcFQ5qg5FXgOdqsJ5d8=
 github.com/gopherjs/gopherjs v0.0.0-20181017120253-0766667cb4d1/go.mod h1:wJfORRmW1u3UXTncJ5qlYoELFm8eSnnEO6hX4iZ3EWY=
-github.com/hatlonely/go-kit v1.0.1-0.20201011122619-c6a72d41b17f h1:kPpmkKTke71wkyd3Ad9hJ9Mvoszw64r+EW6O57RVedM=
-github.com/hatlonely/go-kit v1.0.1-0.20201011122619-c6a72d41b17f/go.mod h1:gk7iF7iSgBVc24y0hTPDXaTfs9Gr6djlCTmHeGW9yEE=
+github.com/hatlonely/go-kit v1.0.1-0.20201011135127-74e4a14cc6c9 h1:onblX/fCk9mNZ2kwoMWO/nOvgUb76IpkWDREgCI/gps=
+github.com/hatlonely/go-kit v1.0.1-0.20201011135127-74e4a14cc6c9/go.mod h1:gk7iF7iSgBVc24y0hTPDXaTfs9Gr6djlCTmHeGW9yEE=
 github.com/hpcloud/tail v1.0.0 h1:nfCOvKYfkgYP8hkirhJocXT2+zOD8yUNjXaWfTlyFKI=
 github.com/hpcloud/tail v1.0.0/go.mod h1:ab1qPbhIpdTxEkNHXyeSf5vhxWSCs/tWer42PpOxQnU=
 github.com/jawher/mow.cli v1.1.0/go.mod h1:aNaQlc7ozF3vw6IJ2dHjp2ZFiA4ozMIYY6PyuRJwlUg=

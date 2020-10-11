@@ -30,9 +30,9 @@ func (p *FileProducer) Produce(vals chan<- interface{}, errs chan<- error) {
 	}
 	defer fp.Close()
 	reader := bufio.NewReader(fp)
-	count := 0
+	lineno := 0
 	for {
-		count++
+		lineno++
 		v := map[string]interface{}{}
 		line, err := reader.ReadBytes('\n')
 		if err != nil {
@@ -42,9 +42,10 @@ func (p *FileProducer) Produce(vals chan<- interface{}, errs chan<- error) {
 			break
 		}
 		if err := json.Unmarshal(line, &v); err != nil {
-			errs <- errors.Wrapf(err, "json.Unmarshal failed, line: [%v]", count)
+			errs <- errors.Wrapf(err, "json.Unmarshal failed, line: [%v]", lineno)
 			continue
 		}
+		v["@lineno"] = lineno
 		vals <- v
 	}
 }
