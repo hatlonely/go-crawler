@@ -6,7 +6,5 @@ RUN echo "Asia/Shanghai" >> /etc/timezone
 COPY docker/ /var/docker/crawler
 RUN mkdir -p /var/docker/crawler/log
 
-EXPOSE 6060
-
 WORKDIR /var/docker/crawler
 CMD [ "bin/crawler", "-c", "config/shicimingju.json" ]
