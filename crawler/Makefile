@@ -1,7 +1,7 @@
 binary=crawler
 dockeruser=hatlonely
 gituser=hatlonely
-repository=go-crawler
+repository=crawler
 version=1.0.0
 export GOPROXY=https://goproxy.io
 
