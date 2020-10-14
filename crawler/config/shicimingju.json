@@ -1,7 +1,7 @@
 {
   "directory": "data/www.shicimingju.com",
   "parallel": 1,
-  "delay": "1s",
+  "delay": "5s",
   "maxDepth": 30,
   "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.100 Safari/537.36",
   "allowDomains": "www.shicimingju.com",

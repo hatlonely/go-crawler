@@ -84,7 +84,11 @@ spec:
         imagePullPolicy: Always
         image: ${Image}:${Version}
         command: ["bin/crawler", "-c", "config/shicimingju.json"]
-
+        volumeMounts:
+        - name: crawler-data
+          mountPath: /var/docker/crawler/data
+        - name: crawler-config
+          mountPath: /var/docker/crawler/config
       volumes:
       - name: crawler-data
         persistentVolumeClaim:
