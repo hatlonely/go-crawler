@@ -25,7 +25,7 @@ function CreateNamespaceIfNotExists() {
 function CreateConfigMap() {
     CreateNamespaceIfNotExists || return 1
 
-cat > tmp/${ConfigFile} <<EOF
+cat > tmp/${ConfigmapFile} <<EOF
 {
   "directory": "data/www.shicimingju.com",
   "parallel": 1,
@@ -38,9 +38,9 @@ cat > tmp/${ConfigFile} <<EOF
 EOF
 
     kubectl get configmap "${Configmap}" -n "${Namespace}" 2>/dev/null 1>&2 && return 0
-    kubectl create configmap "${Configmap}" -n "${Namespace}" --from-file=${ConfigmapFile}=tmp/${ConfigFile} &&
-    Info "[kubectl create configmap crawler -n prod --from-file=crawler-shicimingju.json=config/shicimingju.json] success" ||
-    Warn "[kubectl create configmap crawler -n prod --from-file=crawler-shicimingju.json=config/shicimingju.json] fail"
+    kubectl create configmap "${Configmap}" -n "${Namespace}" --from-file=${ConfigmapFile}=tmp/${ConfigmapFile} &&
+    Info "[kubectl create configmap "${Configmap}" -n "${Namespace}" --from-file=${ConfigmapFile}=tmp/${ConfigmapFile}] success" ||
+    Warn "[kubectl create configmap "${Configmap}" -n "${Namespace}" --from-file=${ConfigmapFile}=tmp/${ConfigmapFile}] fail"
 }
 
 function CreatePullSecretsIfNotExists() {
@@ -55,7 +55,7 @@ function CreatePullSecretsIfNotExists() {
 }
 
 function CreatePVCIfNotExists() {
-    kubectl apply -f - <<EOF
+    cat > tmp/pvc.yaml <<EOF
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -71,10 +71,11 @@ spec:
   storageClassName: nfs-client
   selector:
 EOF
+    kubectl apply -f tmp/pvc.yaml
 }
 
 function CreateJob() {
-    kubectl apply -f - <<EOF
+    cat > tmp/job.yaml <<EOF
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -87,7 +88,7 @@ spec:
   backoffLimit: 1
   template:
     metadata:
-      name: crawler
+      name: ${Name}
     spec:
       imagePullSecrets:
       - name: ${PullSecrets}
@@ -97,24 +98,25 @@ spec:
         image: ${Image}:${Version}
         command: ["bin/crawler", "-c", "config/shicimingju.json"]
         volumeMounts:
-        - name: crawler-data
+        - name: ${Name}-data
           mountPath: /var/docker/crawler/data
-        - name: crawler-config
+        - name: ${Name}-config
           mountPath: /var/docker/crawler/config
       volumes:
-      - name: crawler-data
+      - name: ${Name}-data
         persistentVolumeClaim:
           claimName: crawler-pvc
-      - name: crawler-config
+      - name: ${Name}-config
         projected:
           sources:
           - configMap:
               name: ${Configmap}
               items:
-                - key: crawler-shicimingju.json
+                - key: ${ConfigmapFile}
                   path: shicimingju.json
       restartPolicy: OnFailure
 EOF
+    kubectl apply -f tmp/job.yaml
 }
 
 function main() {
