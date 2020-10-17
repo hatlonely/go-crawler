@@ -1,14 +1,14 @@
 binary=crawler
 dockeruser=hatlonely
 gituser=hatlonely
-repository=crawler
+repository=go-crawler/crawler
 version=1.0.0
 export GOPROXY=https://goproxy.io
 
 .PHONY: build
 build: cmd/main.go Makefile
 	mkdir -p build/bin
-	go build -ldflags "-X 'main.Version=`sh ../scripts/version.sh`'" cmd/main.go && mv main build/bin/${binary} && cp -r config build/
+	go build -ldflags "-X 'main.Version=`sh scripts/version.sh`'" cmd/main.go && mv main build/bin/${binary} && cp -r config build/
 
 vendor: go.mod go.sum
 	@echo "install golang dependency"
@@ -36,14 +36,9 @@ cleandockerenv:
 image: dockerenv
 	rm -rf docker
 	docker exec go-build-env rm -rf /data/src/${gituser}/${repository}
-	docker exec go-build-env mkdir -p /data/src/${gituser}/${repository}/crawler
-	docker cp ../scripts go-build-env:/data/src/${gituser}/${repository}
-	docker cp ../go.mod go-build-env:/data/src/${gituser}/${repository}
-	docker cp ../go.sum go-build-env:/data/src/${gituser}/${repository}
-	docker cp cmd go-build-env:/data/src/${gituser}/${repository}/crawler/
-	docker cp config go-build-env:/data/src/${gituser}/${repository}/crawler/
-	docker cp Makefile go-build-env:/data/src/${gituser}/${repository}/crawler/
-	docker exec go-build-env bash -c "cd /data/src/${gituser}/${repository}/crawler && make build"
-	docker cp go-build-env:/data/src/${gituser}/${repository}/crawler/build/ docker/
+	docker exec go-build-env mkdir -p /data/src/${gituser}/${repository}
+	docker cp . go-build-env:/data/src/${gituser}/${repository}
+	docker exec go-build-env bash -c "cd /data/src/${gituser}/${repository} && make build"
+	docker cp go-build-env:/data/src/${gituser}/${repository}/build/ docker/
 	docker build --tag=hatlonely/${repository}:${version} .
 
