@@ -71,7 +71,9 @@ spec:
   storageClassName: nfs-client
   selector:
 EOF
-    kubectl apply -f tmp/pvc.yaml
+    kubectl apply -f tmp/pvc.yaml &&
+    Info "[kubectl apply -f tmp/pvc.yaml] success" ||
+    Warn "[kubectl apply -f tmp/pvc.yaml] failed"
 }
 
 function CreateJob() {
@@ -116,7 +118,9 @@ spec:
                   path: shicimingju.json
       restartPolicy: OnFailure
 EOF
-    kubectl apply -f tmp/job.yaml
+    kubectl apply -f tmp/job.yaml &&
+    Info "[kubectl apply -f tmp/job.yaml] success" ||
+    Warn "[kubectl apply -f tmp/job.yaml] failed"
 }
 
 function main() {

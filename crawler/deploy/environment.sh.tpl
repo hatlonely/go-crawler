@@ -7,5 +7,5 @@ DockerPassword={{.docker.password}}
 Configmap="go-crawler"
 ConfigmapFile="crawler.shicimingju.json"
 PullSecrets="hatlonely-pull-secrets"
-Image="docker.io/hatlonely/go-crawler/crawler"
+Image="docker.io/hatlonely/go-crawler-crawler"
 Version="1.0.0"

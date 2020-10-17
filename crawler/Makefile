@@ -1,7 +1,7 @@
 binary=crawler
 dockeruser=hatlonely
 gituser=hatlonely
-repository=go-crawler/crawler
+repository=go-crawler-crawler
 version=1.0.0
 export GOPROXY=https://goproxy.io
 
@@ -41,4 +41,5 @@ image: dockerenv
 	docker exec go-build-env bash -c "cd /data/src/${gituser}/${repository} && make build"
 	docker cp go-build-env:/data/src/${gituser}/${repository}/build/ docker/
 	docker build --tag=hatlonely/${repository}:${version} .
+	docker push hatlonely/${repository}:${version}
 
