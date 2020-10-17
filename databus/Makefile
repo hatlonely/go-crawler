@@ -1,7 +1,7 @@
-binary=analyst
+binary=databus
 dockeruser=hatlonely
 gituser=hatlonely
-repository=go-crawler-analyst
+repository=go-crawler-databus
 version=1.0.0
 export GOPROXY=https://goproxy.io
 
