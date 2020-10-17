@@ -22,6 +22,17 @@ function CreateNamespaceIfNotExists() {
     Warn "create namespace ${Namespace} failed"
 }
 
+function CreatePullSecretsIfNotExists() {
+    kubectl get secret "${PullSecrets}" -n "${Namespace}" 2>/dev/null 1>&2 && return 0
+    kubectl create secret docker-registry ${PullSecrets} \
+        --docker-server="docker.io" \
+        --docker-username="${DockerUser}" \
+        --docker-password="${DockerPassword}" \
+        --namespace="prod" &&
+    Info "[kubectl create pull secret ${DockerUser}] success" ||
+    Warn "[kubectl create pull secret ${DockerPassword}] failed"
+}
+
 function CreateConfigMap() {
     CreateNamespaceIfNotExists || return 1
 
@@ -41,17 +52,6 @@ EOF
     kubectl create configmap "${Configmap}" -n "${Namespace}" --from-file=${ConfigmapFile}=tmp/${ConfigmapFile} &&
     Info "[kubectl create configmap "${Configmap}" -n "${Namespace}" --from-file=${ConfigmapFile}=tmp/${ConfigmapFile}] success" ||
     Warn "[kubectl create configmap "${Configmap}" -n "${Namespace}" --from-file=${ConfigmapFile}=tmp/${ConfigmapFile}] fail"
-}
-
-function CreatePullSecretsIfNotExists() {
-    kubectl get secret "${PullSecrets}" -n "${Namespace}" 2>/dev/null 1>&2 && return 0
-    kubectl create secret docker-registry ${PullSecrets} \
-        --docker-server="docker.io" \
-        --docker-username="${DockerUser}" \
-        --docker-password="${DockerPassword}" \
-        --namespace="prod" &&
-    Info "[kubectl create pull secret ${DockerUser}] success" ||
-    Warn "[kubectl create pull secret ${DockerPassword}] failed"
 }
 
 function CreatePVCIfNotExists() {
