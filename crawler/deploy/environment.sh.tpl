@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 Namespace="prod"
-Name="crawler"
+Name="go-crawler-crawler"
 DockerUser={{.docker.user}}
 DockerPassword={{.docker.password}}
 Configmap="go-crawler"
