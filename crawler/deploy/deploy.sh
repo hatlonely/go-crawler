@@ -25,8 +25,20 @@ function CreateNamespaceIfNotExists() {
 function CreateConfigMap() {
     CreateNamespaceIfNotExists || return 1
 
+cat > tmp/${ConfigFile} <<EOF
+{
+  "directory": "data/www.shicimingju.com",
+  "parallel": 1,
+  "delay": "5s",
+  "maxDepth": 30,
+  "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.100 Safari/537.36",
+  "allowDomains": "www.shicimingju.com",
+  "startPage": "https://www.shicimingju.com/"
+}
+EOF
+
     kubectl get configmap "${Configmap}" -n "${Namespace}" 2>/dev/null 1>&2 && return 0
-    kubectl create configmap "${Configmap}" -n "${Namespace}" --from-file=${ConfigmapFile}=../config/${ConfigFile} &&
+    kubectl create configmap "${Configmap}" -n "${Namespace}" --from-file=${ConfigmapFile}=tmp/${ConfigFile} &&
     Info "[kubectl create configmap crawler -n prod --from-file=crawler-shicimingju.json=config/shicimingju.json] success" ||
     Warn "[kubectl create configmap crawler -n prod --from-file=crawler-shicimingju.json=config/shicimingju.json] fail"
 }
@@ -97,7 +109,7 @@ spec:
         projected:
           sources:
           - configMap:
-              name: crawler
+              name: ${Configmap}
               items:
                 - key: crawler-shicimingju.json
                   path: shicimingju.json
