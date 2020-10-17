@@ -25,12 +25,12 @@ function CreateNamespaceIfNotExists() {
 function CreatePullSecretsIfNotExists() {
     kubectl get secret "${PullSecrets}" -n "${Namespace}" 2>/dev/null 1>&2 && return 0
     kubectl create secret docker-registry ${PullSecrets} \
-        --docker-server="docker.io" \
-        --docker-username="${DockerUser}" \
-        --docker-password="${DockerPassword}" \
+        --docker-server="${RegistryServer}" \
+        --docker-username="${RegistryUser}" \
+        --docker-password="${RegistryPassword}" \
         --namespace="prod" &&
-    Info "[kubectl create pull secret ${DockerUser}] success" ||
-    Warn "[kubectl create pull secret ${DockerPassword}] failed"
+    Info "[kubectl create secret docker-registry ${PullSecrets}] success" ||
+    Warn "[kubectl create secret docker-registry ${PullSecrets}] failed"
 }
 
 function CreateConfigMap() {
