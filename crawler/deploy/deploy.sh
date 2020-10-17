@@ -60,7 +60,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   namespace: prod
-  name: crawler-pvc
+  name: ${PVCName}
 spec:
   accessModes:
     - ReadWriteMany
@@ -107,7 +107,7 @@ spec:
       volumes:
       - name: ${Name}-data
         persistentVolumeClaim:
-          claimName: crawler-pvc
+          claimName: ${PVCName}
       - name: ${Name}-config
         projected:
           sources:
