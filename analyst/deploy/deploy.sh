@@ -50,6 +50,7 @@ cat > tmp/${ConfigmapFile} <<EOF
 EOF
 
     kubectl get configmap "${Configmap}" -n "${Namespace}" 2>/dev/null 1>&2 && return 0
+
     kubectl create configmap "${Configmap}" -n "${Namespace}" --from-file=${ConfigmapFile}=tmp/${ConfigmapFile} &&
     Info "[kubectl create configmap "${Configmap}" -n "${Namespace}" --from-file=${ConfigmapFile}=tmp/${ConfigmapFile}] success" ||
     Warn "[kubectl create configmap "${Configmap}" -n "${Namespace}" --from-file=${ConfigmapFile}=tmp/${ConfigmapFile}] fail"
@@ -80,9 +81,9 @@ spec:
         command: [ "bin/analyst", "-c", "config/shicimingju.json" ]
         volumeMounts:
         - name: ${Name}-data
-          mountPath: /var/docker/crawler/data
+          mountPath: /var/docker/${Name}/data
         - name: ${Name}-config
-          mountPath: /var/docker/crawler/config
+          mountPath: /var/docker/${Name}/config
       volumes:
       - name: ${Name}-data
         persistentVolumeClaim:
