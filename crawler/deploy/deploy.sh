@@ -38,7 +38,7 @@ function CreateConfigMap() {
 
 cat > tmp/${ConfigmapFile} <<EOF
 {
-  "directory": "data/www.shicimingju.com",
+  "directory": "data/crawler/www.shicimingju.com",
   "parallel": 1,
   "delay": "5s",
   "maxDepth": 30,

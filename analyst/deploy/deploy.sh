@@ -39,12 +39,12 @@ function CreateConfigMap() {
 cat > tmp/${ConfigmapFile} <<EOF
 {
   "book": {
-    "root": "data/www.shicimingju.com",
-    "out": "book.json"
+    "root": "data/crawler/www.shicimingju.com",
+    "out":  "data/analyst/www.shicimingju.com/book.json"
   },
   "shiCi": {
-    "root": "data/www.shicimingju.com",
-    "out": "shici.json"
+    "root": "data/crawler/www.shicimingju.com",
+    "out":  "data/analyst/www.shicimingju.com/shici.json"
   }
 }
 EOF
