@@ -15,6 +15,13 @@ function Warn() {
     return 1
 }
 
+function Build() {
+    cd .. && make image && cd -
+    docker tag ${Image}:${Version} ${RegistryServer}/${Image}:${Version}
+    docker login --username="${RegistryUser}" --password="${RegistryPassword}" "${RegistryServer}"
+    docker push ${RegistryServer}/${Image}:${Version}
+}
+
 function CreateNamespaceIfNotExists() {
     kubectl get namespaces "${Namespace}" 2>/dev/null 1>&2 && return 0
     kubectl create namespace "${Namespace}" &&
@@ -118,15 +125,34 @@ spec:
                   path: shicimingju.json
       restartPolicy: OnFailure
 EOF
+
+    kubectl get job -n "${Namespace}" "${Name}" && kubectl delete job -n "${Namespace}" "${Name}"
     kubectl apply -f tmp/job.yaml &&
     Info "[kubectl apply -f tmp/job.yaml] success" ||
     Warn "[kubectl apply -f tmp/job.yaml] failed"
 }
 
+function Help() {
+    echo "sh deploy.sh <env>"
+    echo "example"
+    echo "  sh deploy.sh build"
+    echo "  sh deploy.sh configmap"
+    echo "  sh deploy.sh secret"
+    echo "  sh deploy.sh job"
+}
+
 function main() {
-    CreateConfigMap || return 2
-    CreatePullSecretsIfNotExists || return 3
-    CreateJob
+    if [ -z "$1" ]; then
+        Help
+        return 0
+    fi
+
+    case "$1" in
+        "build") Build;;
+        "configmap") CreateConfigMap;;
+        "secret") CreatePullSecretsIfNotExists;;
+        "job") CreateJob;;
+    esac
 }
 
 main "$@"
