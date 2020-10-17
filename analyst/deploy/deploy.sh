@@ -15,6 +15,13 @@ function Warn() {
     return 1
 }
 
+function Build() {
+    cd .. && make image && cd -
+    docker tag ${Image}:${Version} ${RegistryServer}/${Image}:${Version}
+    docker login --username="${RegistryUser}" --password="${RegistryPassword}" "${RegistryServer}"
+    docker push ${RegistryServer}/${Image}:${Version}
+}
+
 function CreateNamespaceIfNotExists() {
     kubectl get namespaces "${Namespace}" 2>/dev/null 1>&2 && return 0
     kubectl create namespace "${Namespace}" &&
@@ -77,7 +84,7 @@ spec:
       containers:
       - name: ${Name}
         imagePullPolicy: Always
-        image: ${Image}:${Version}
+        image: ${RegistryServer}/${Image}:${Version}
         command: [ "bin/analyst", "-c", "config/shicimingju.json" ]
         volumeMounts:
         - name: ${Name}-data
@@ -104,9 +111,10 @@ EOF
 }
 
 function main() {
-    CreateConfigMap || return 2
-    CreatePullSecretsIfNotExists || return 3
-    CreateJob
+    Build
+#    CreateConfigMap || return 2
+#    CreatePullSecretsIfNotExists || return 3
+#    CreateJob
 }
 
 main "$@"
