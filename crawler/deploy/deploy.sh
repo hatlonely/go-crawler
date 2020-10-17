@@ -133,7 +133,7 @@ EOF
 }
 
 function Help() {
-    echo "sh deploy.sh <env>"
+    echo "sh deploy.sh <action>"
     echo "example"
     echo "  sh deploy.sh build"
     echo "  sh deploy.sh configmap"
