@@ -40,6 +40,12 @@ func NewMysqlConsumerWithConfig(cfg *config.Config) (*MysqlConsumer, error) {
 }
 
 func NewMysqlConsumerWithOptions(mysqlCli *gorm.DB, options *MysqlConsumerOptions) (*MysqlConsumer, error) {
+	if options.Table == "shici" && !mysqlCli.HasTable(&ShiCi{}) {
+		if err := mysqlCli.Set("gorm:table_options", "ENGINE=InnoDB DEFAULT CHARSET=utf8").CreateTable(&ShiCi{}).Error; err != nil {
+			return nil, err
+		}
+	}
+
 	keyMap := options.KeyMap
 	for _, field := range options.Fields {
 		if _, ok := keyMap[field]; !ok {
@@ -71,14 +77,6 @@ func NewMysqlConsumerWithOptions(mysqlCli *gorm.DB, options *MysqlConsumerOption
 		keyMap:   keyMap,
 		sql:      sql,
 	}, nil
-}
-
-func NewMysqlConsumer(mysqlCli *gorm.DB, table string, fields []string, keyMap map[string]string) (*MysqlConsumer, error) {
-	return NewMysqlConsumerWithOptions(mysqlCli, &MysqlConsumerOptions{
-		Table:  table,
-		Fields: fields,
-		KeyMap: keyMap,
-	})
 }
 
 func (c *MysqlConsumer) Consume(vals <-chan interface{}, errs chan<- error) {
