@@ -18,7 +18,7 @@ function Warn() {
 function Build() {
     cd .. && make image && cd -
     docker tag ${Image}:${Version} ${RegistryServer}/${Image}:${Version}
-    docker login --username="${RegistryUser}" --password="${RegistryPassword}" "${RegistryServer}"
+    docker login --username="${RegistryUsername}" --password="${RegistryPassword}" "${RegistryServer}"
     docker push ${RegistryServer}/${Image}:${Version}
 }
 
@@ -33,7 +33,7 @@ function CreatePullSecretsIfNotExists() {
     kubectl get secret "${PullSecrets}" -n "${Namespace}" 2>/dev/null 1>&2 && return 0
     kubectl create secret docker-registry ${PullSecrets} \
         --docker-server="${RegistryServer}" \
-        --docker-username="${RegistryUser}" \
+        --docker-username="${RegistryUsername}" \
         --docker-password="${RegistryPassword}" \
         --namespace="prod" &&
     Info "[kubectl create secret docker-registry ${PullSecrets}] success" ||

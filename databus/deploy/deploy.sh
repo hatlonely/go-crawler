@@ -22,6 +22,14 @@ function Build() {
     docker push ${RegistryServer}/${Image}:${Version}
 }
 
+function SQLTpl() {
+    cat > tmp/create_db.sql <<EOF
+CREATE USER '${MysqlUsername}'@'%' IDENTIFIED BY '${MysqlPassword}';
+CREATE DATABASE ${MysqlDatabase};
+GRANT ALL PRIVILEGES ON ancient.* TO '${MysqlUsername}'@'%';
+EOF
+}
+
 function CreateNamespaceIfNotExists() {
     kubectl get namespaces "${Namespace}" 2>/dev/null 1>&2 && return 0
     kubectl create namespace "${Namespace}" &&
@@ -45,42 +53,37 @@ function CreateConfigMap() {
 
 cat > tmp/${ConfigmapFile} <<EOF
 {
-  "directory": "data/crawler/www.shicimingju.com",
-  "parallel": 1,
-  "delay": "5s",
-  "maxDepth": 30,
-  "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.100 Safari/537.36",
-  "allowDomains": "www.shicimingju.com",
-  "startPage": "https://www.shicimingju.com/"
+  "producer": {
+    "type": "file",
+    "filename": "data/analyst/www.shicimingju.com/shici.json"
+  },
+  "consumer": {
+    "type": "mysql",
+    "mysql": {
+      "username": "${MysqlUsername}",
+      "password": "${MysqlPassword}",
+      "database": "${MysqlDatabase}",
+      "host": "${MysqlServer}",
+      "port": 3306,
+      "connMaxLifeTime": "60s",
+      "maxIdleConns": 10,
+      "maxOpenConns": 20
+    },
+    "table": "shici",
+    "fields": ["id", "title", "author", "dynasty", "content"],
+    "keyMap": {
+      "id": "@lineno"
+    }
+  },
+  "parallel": 1
 }
 EOF
 
     kubectl get configmap "${Configmap}" -n "${Namespace}" 2>/dev/null 1>&2 && return 0
+
     kubectl create configmap "${Configmap}" -n "${Namespace}" --from-file=${ConfigmapFile}=tmp/${ConfigmapFile} &&
     Info "[kubectl create configmap "${Configmap}" -n "${Namespace}" --from-file=${ConfigmapFile}=tmp/${ConfigmapFile}] success" ||
     Warn "[kubectl create configmap "${Configmap}" -n "${Namespace}" --from-file=${ConfigmapFile}=tmp/${ConfigmapFile}] fail"
-}
-
-function CreatePVCIfNotExists() {
-    cat > tmp/pvc.yaml <<EOF
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  namespace: prod
-  name: ${PVCName}
-spec:
-  accessModes:
-    - ReadWriteMany
-  volumeMode: Filesystem
-  resources:
-    requests:
-      storage: 50Gi
-  storageClassName: nfs-client
-  selector:
-EOF
-    kubectl apply -f tmp/pvc.yaml &&
-    Info "[kubectl apply -f tmp/pvc.yaml] success" ||
-    Warn "[kubectl apply -f tmp/pvc.yaml] failed"
 }
 
 function CreateJob() {
@@ -105,12 +108,12 @@ spec:
       - name: ${Name}
         imagePullPolicy: Always
         image: ${Image}:${Version}
-        command: ["bin/crawler", "-c", "config/shicimingju.json"]
+        command: [ "bin/databus", "-c", "config/shici.json" ]
         volumeMounts:
         - name: ${Name}-data
-          mountPath: /var/docker/crawler/data
+          mountPath: /var/docker/${Name}/data
         - name: ${Name}-config
-          mountPath: /var/docker/crawler/config
+          mountPath: /var/docker/${Name}/config
       volumes:
       - name: ${Name}-data
         persistentVolumeClaim:
@@ -122,7 +125,7 @@ spec:
               name: ${Configmap}
               items:
                 - key: ${ConfigmapFile}
-                  path: shicimingju.json
+                  path: shici.json
       restartPolicy: OnFailure
 EOF
 
@@ -136,6 +139,7 @@ function Help() {
     echo "sh deploy.sh <action>"
     echo "example"
     echo "  sh deploy.sh build"
+    echo "  sh deploy.sh sql"
     echo "  sh deploy.sh configmap"
     echo "  sh deploy.sh secret"
     echo "  sh deploy.sh job"
@@ -149,6 +153,7 @@ function main() {
 
     case "$1" in
         "build") Build;;
+        "sql") SQLTpl;;
         "configmap") CreateConfigMap;;
         "secret") CreatePullSecretsIfNotExists;;
         "job") CreateJob;;

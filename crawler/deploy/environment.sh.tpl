@@ -3,7 +3,7 @@
 Namespace="prod"
 Name="go-crawler-crawler"
 RegistryServer={{.registry.server}}
-RegistryUser={{.registry.user}}
+RegistryUsername={{.registry.username}}
 RegistryPassword={{.registry.password}}
 PVCName="crawler-pvc"
 Configmap="go-crawler-crawler"
