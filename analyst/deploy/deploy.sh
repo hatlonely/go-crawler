@@ -111,10 +111,9 @@ EOF
 }
 
 function main() {
-    Build
-#    CreateConfigMap || return 2
-#    CreatePullSecretsIfNotExists || return 3
-#    CreateJob
+    CreateConfigMap || return 2
+    CreatePullSecretsIfNotExists || return 3
+    CreateJob
 }
 
 main "$@"
