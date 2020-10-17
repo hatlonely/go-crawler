@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path"
 	"sort"
 	"strconv"
 	"strings"
@@ -58,6 +59,7 @@ type Book struct {
 }
 
 func (a *BookAnalyst) AnalystAndSaveResult() error {
+	_ = os.MkdirAll(path.Dir(a.Out), 0755)
 	fp, err := os.Create(a.Out)
 	if err != nil {
 		return err
