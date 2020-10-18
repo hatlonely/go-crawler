@@ -23,11 +23,25 @@ function Build() {
 }
 
 function SQLTpl() {
-    cat > tmp/create_db.sql <<EOF
-CREATE USER '${MysqlUsername}'@'%' IDENTIFIED BY '${MysqlPassword}';
-CREATE DATABASE ${MysqlDatabase};
-GRANT ALL PRIVILEGES ON ancient.* TO '${MysqlUsername}'@'%';
+    cat > tmp/create_table.sql <<EOF
+CREATE DATABASE IF NOT EXISTS ${MysqlDatabase};
+CREATE USER IF NOT EXISTS '${MysqlUsername}'@'%' IDENTIFIED BY '${MysqlPassword}';
+GRANT ALL PRIVILEGES ON ${MysqlDatabase}.* TO '${MysqlUsername}'@'%';
+
+USE ${MysqlDatabase};
+CREATE TABLE IF NOT EXISTS \`shici\` (
+  \`id\` bigint(20) NOT NULL,
+  \`title\` varchar(64) NOT NULL,
+  \`author\` varchar(64) NOT NULL,
+  \`dynasty\` varchar(32) NOT NULL,
+  \`content\` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci NOT NULL,
+  PRIMARY KEY (\`id\`),
+  KEY \`title_idx\` (\`title\`),
+  KEY \`author_idx\` (\`author\`),
+  KEY \`dynasty_idx\` (\`dynasty\`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 EOF
+    kubectl run -n prod -it --rm sql --image=mysql:5.7.30 --restart=Never -- mysql -uroot -hmysql -p${MysqlRootPassword} -e "$(cat tmp/create_table.sql)"
 }
 
 function CreateNamespaceIfNotExists() {

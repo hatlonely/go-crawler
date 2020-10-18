@@ -6,6 +6,7 @@ RegistryServer={{.registry.server}}
 RegistryUsername={{.registry.username}}
 RegistryPassword={{.registry.password}}
 MysqlServer={{.mysql.server}}
+MysqlRootPassword={{.mysql.rootPassword}}
 MysqlUsername={{.mysql.username}}
 MysqlPassword={{.mysql.password}}
 MysqlDatabase="ancient"
