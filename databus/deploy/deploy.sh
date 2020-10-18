@@ -17,8 +17,8 @@ function Warn() {
 
 function Build() {
     cd .. && make image && cd -
-    docker tag ${Image}:${Version} ${RegistryServer}/${Image}:${Version}
     docker login --username="${RegistryUsername}" --password="${RegistryPassword}" "${RegistryServer}"
+    docker tag ${Image}:${Version} ${RegistryServer}/${Image}:${Version}
     docker push ${RegistryServer}/${Image}:${Version}
 }
 
