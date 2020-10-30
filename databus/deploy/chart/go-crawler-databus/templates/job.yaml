@@ -32,7 +32,7 @@ spec:
       volumes:
         - name: {{.Values.name}}-data
           persistentVolumeClaim:
-            claimName: crawler-pvc
+            claimName: {{.Values.pvc.name}}
         - name: {{.Values.name}}-config
           projected:
             sources:

@@ -1,7 +1,9 @@
 namespace: prod
 name: go-crawler-databus
 activeDeadlineSeconds: 86400
-pvcName: crawler-pvc
+
+pvc:
+  name: crawler-pvc
 
 image:
   repository: registry.cn-beijing.aliyuncs.com/hatlonely/go-crawler-databus

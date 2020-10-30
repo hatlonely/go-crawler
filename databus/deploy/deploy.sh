@@ -68,6 +68,9 @@ namespace: ${Namespace}
 name: ${Name}
 activeDeadlineSeconds: 86400
 
+pvc:
+  name: ${PVCName}
+
 image:
   repository: ${RegistryServer}/${Image}
   tag: ${Version}
