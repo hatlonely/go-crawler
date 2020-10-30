@@ -1,0 +1,29 @@
+debug: false
+namespace: prod
+name: go-crawler-crawler
+activeDeadlineSeconds: 86400
+
+pvc:
+  name: crawler-pvc
+  storage: 50Gi
+  storageClassName: nfs-client
+
+image:
+  repository: registry.cn-beijing.aliyuncs.com/hatlonely/go-crawler-crawler
+  tag: 1.0.0
+  pullPolicy: Always
+
+imagePullSecrets:
+  name: hatlonely-pull-secrets
+
+config: |
+  {
+    "directory": "data/www.shicimingju.com",
+    "parallel": 1,
+    "delay": "5s",
+    "domainGlob": "*.shicimingju.*",
+    "maxDepth": 30,
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.100 Safari/537.36",
+    "allowDomains": "www.shicimingju.com",
+    "startPage": "https://www.shicimingju.com/"
+  }
