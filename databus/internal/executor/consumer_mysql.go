@@ -7,7 +7,7 @@ import (
 
 	"github.com/hatlonely/go-kit/cli"
 	"github.com/hatlonely/go-kit/config"
-	"github.com/hatlonely/go-kit/refex"
+	"github.com/hatlonely/go-kit/refx"
 	"github.com/jinzhu/gorm"
 	"github.com/pkg/errors"
 )
@@ -33,7 +33,7 @@ func NewMysqlConsumerWithConfig(cfg *config.Config) (*MysqlConsumer, error) {
 		return nil, err
 	}
 	options := &MysqlConsumerOptions{}
-	if err := cfg.Unmarshal(options, refex.WithCamelName()); err != nil {
+	if err := cfg.Unmarshal(options, refx.WithCamelName()); err != nil {
 		return nil, err
 	}
 	return NewMysqlConsumerWithOptions(mysqlCli, options)
