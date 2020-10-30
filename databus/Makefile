@@ -3,7 +3,7 @@ dockeruser=hatlonely
 gituser=hatlonely
 repository=go-crawler-databus
 version=1.0.0
-export GOPROXY=https://goproxy.io
+export GOPROXY=https://goproxy.cn
 
 .PHONY: build
 build: cmd/main.go internal/*/*.go Makefile

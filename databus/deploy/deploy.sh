@@ -18,8 +18,8 @@ function Warn() {
 function Build() {
     cd .. && make image && cd -
     docker login --username="${RegistryUsername}" --password="${RegistryPassword}" "${RegistryServer}"
-    docker tag ${Image}:${Version} ${RegistryServer}/${Image}:${Version}
-    docker push ${RegistryServer}/${Image}:${Version}
+    docker tag "${Image}:${Version}" "${RegistryServer}/${Image}:${Version}"
+    docker push "${RegistryServer}/${Image}:${Version}"
 }
 
 function SQLTpl() {
@@ -53,7 +53,7 @@ function CreateNamespaceIfNotExists() {
 
 function CreatePullSecretsIfNotExists() {
     kubectl get secret "${PullSecrets}" -n "${Namespace}" 2>/dev/null 1>&2 && return 0
-    kubectl create secret docker-registry ${PullSecrets} \
+    kubectl create secret docker-registry "${PullSecrets}" \
         --docker-server="${RegistryServer}" \
         --docker-username="${RegistryUsername}" \
         --docker-password="${RegistryPassword}" \
@@ -62,91 +62,67 @@ function CreatePullSecretsIfNotExists() {
     Warn "[kubectl create secret docker-registry ${PullSecrets}] failed"
 }
 
-function CreateConfigMap() {
-    CreateNamespaceIfNotExists || return 1
+function Render() {
+    cat > tmp/chart.yaml <<EOF
+namespace: ${Namespace}
+name: ${Name}
+parallelism: 1
 
-cat > tmp/${ConfigmapFile} <<EOF
-{
-  "producer": {
-    "type": "file",
-    "filename": "data/analyst/www.shicimingju.com/shici.json"
-  },
-  "consumer": {
-    "type": "mysql",
-    "mysql": {
-      "username": "${MysqlUsername}",
-      "password": "${MysqlPassword}",
-      "database": "${MysqlDatabase}",
-      "host": "${MysqlServer}",
-      "port": 3306,
-      "connMaxLifeTime": "60s",
-      "maxIdleConns": 10,
-      "maxOpenConns": 20
+image:
+  repository: ${RegistryServer}/${Image}
+  tag: ${Version}
+  pullPolicy: Always
+
+imagePullSecrets:
+  name: ${PullSecrets}
+
+config: |
+  {
+    "producer": {
+      "type": "file",
+      "filename": "data/analyst/www.shicimingju.com/shici.json"
     },
-    "table": "shici",
-    "fields": ["id", "title", "author", "dynasty", "content"],
-    "keyMap": {
-      "id": "@lineno"
-    }
-  },
-  "parallel": 1
-}
+    "consumer": {
+      "type": "mysql",
+      "mysql": {
+        "username": "${MysqlUsername}",
+        "password": "${MysqlPassword}",
+        "database": "${MysqlDatabase}",
+        "host": "${MysqlServer}",
+        "port": 3306,
+        "connMaxLifeTime": "60s",
+        "maxIdleConns": 10,
+        "maxOpenConns": 20
+      },
+      "table": "shici",
+      "fields": ["id", "title", "author", "dynasty", "content"],
+      "keyMap": {
+        "id": "@lineno"
+      }
+    },
+    "parallel": 1
+  }
 EOF
-
-    kubectl get configmap "${Configmap}" -n "${Namespace}" 2>/dev/null 1>&2 && return 0
-
-    kubectl create configmap "${Configmap}" -n "${Namespace}" --from-file=${ConfigmapFile}=tmp/${ConfigmapFile} &&
-    Info "[kubectl create configmap "${Configmap}" -n "${Namespace}" --from-file=${ConfigmapFile}=tmp/${ConfigmapFile}] success" ||
-    Warn "[kubectl create configmap "${Configmap}" -n "${Namespace}" --from-file=${ConfigmapFile}=tmp/${ConfigmapFile}] fail"
 }
 
-function CreateJob() {
-    cat > tmp/job.yaml <<EOF
-apiVersion: batch/v1
-kind: Job
-metadata:
-  name: ${Name}
-  namespace: ${Namespace}
-spec:
-  parallelism: 1
-  completions: 1
-  activeDeadlineSeconds: 1800
-  backoffLimit: 1
-  template:
-    metadata:
-      name: ${Name}
-    spec:
-      imagePullSecrets:
-      - name: ${PullSecrets}
-      containers:
-      - name: ${Name}
-        imagePullPolicy: Always
-        image: ${Image}:${Version}
-        command: [ "bin/databus", "-c", "config/shici.json" ]
-        volumeMounts:
-        - name: ${Name}-data
-          mountPath: /var/docker/${Name}/data
-        - name: ${Name}-config
-          mountPath: /var/docker/${Name}/config
-      volumes:
-      - name: ${Name}-data
-        persistentVolumeClaim:
-          claimName: ${PVCName}
-      - name: ${Name}-config
-        projected:
-          sources:
-          - configMap:
-              name: ${Configmap}
-              items:
-                - key: ${ConfigmapFile}
-                  path: shici.json
-      restartPolicy: OnFailure
-EOF
+function Run() {
+     kubectl run -n "${Namespace}" -it --rm "${Name}" --image="${RegistryServer}/${Image}:${Version}" --restart=Never -- /bin/bash
+}
 
-    kubectl get job -n "${Namespace}" "${Name}" && kubectl delete job -n "${Namespace}" "${Name}"
-    kubectl apply -f tmp/job.yaml &&
-    Info "[kubectl apply -f tmp/job.yaml] success" ||
-    Warn "[kubectl apply -f tmp/job.yaml] failed"
+function Install() {
+    helm install "${Name}" -n "${Namespace}" "./chart/${Name}" -f "tmp/chart.yaml"
+}
+
+function Upgrade() {
+    helm upgrade "${Name}" -n "${Namespace}" "./chart/${Name}" -f "tmp/chart.yaml"
+}
+
+function Delete() {
+    helm delete "${Name}" -n "${Namespace}"
+}
+
+function Diff() {
+    helm diff upgrade "${Name}" -n "${Namespace}" "./chart/${Name}" -f "tmp/chart.yaml"
 }
 
 function Help() {
@@ -154,9 +130,13 @@ function Help() {
     echo "example"
     echo "  sh deploy.sh build"
     echo "  sh deploy.sh sql"
-    echo "  sh deploy.sh configmap"
     echo "  sh deploy.sh secret"
-    echo "  sh deploy.sh job"
+    echo "  sh deploy.sh render"
+    echo "  sh deploy.sh install"
+    echo "  sh deploy.sh upgrade"
+    echo "  sh deploy.sh delete"
+    echo "  sh deploy.sh diff"
+    echo "  sh deploy.sh run"
 }
 
 function main() {
@@ -168,9 +148,13 @@ function main() {
     case "$1" in
         "build") Build;;
         "sql") SQLTpl;;
-        "configmap") CreateConfigMap;;
         "secret") CreatePullSecretsIfNotExists;;
-        "job") CreateJob;;
+        "render") Render;;
+        "install") Render && Install;;
+        "upgrade") Render && Upgrade;;
+        "diff") Render && Diff;;
+        "delete") Delete;;
+        "run") Run;;
     esac
 }
 
