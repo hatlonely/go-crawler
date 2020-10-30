@@ -10,6 +10,8 @@ import (
 	"github.com/hatlonely/go-kit/binding"
 	"github.com/hatlonely/go-kit/config"
 	"github.com/hatlonely/go-kit/flag"
+	"github.com/hatlonely/go-kit/logger"
+	"github.com/hatlonely/go-kit/strx"
 )
 
 var Version string
@@ -56,6 +58,9 @@ func main() {
 
 	Must(binding.Bind(&options, flag.Instance(), binding.NewEnvGetter(), cfg))
 
+	log := logger.NewLogger(logger.LevelInfo, logger.NewStdoutWriter())
+	log.Info(strx.JsonMarshal(options))
+
 	c := colly.NewCollector(
 		//colly.Async(),
 		colly.UserAgent(options.UserAgent),
@@ -77,33 +82,33 @@ func main() {
 		}
 		if err := e.Request.Visit(href); err == colly.ErrMaxDepth || err == colly.ErrAlreadyVisited || err == colly.ErrForbiddenDomain {
 		} else if err != nil {
-			fmt.Println(err)
+			log.Warn(err)
 		}
 	})
 
 	c.OnRequest(func(req *colly.Request) {
-		fmt.Println("Visiting", req.URL, req.ID, req.Depth)
+		log.Warn(fmt.Sprintf("Visiting %v %v %v", req.URL, req.ID, req.Depth))
 	})
 
 	c.OnError(func(r *colly.Response, err error) {
-		fmt.Println("Request URL:", r.Request.URL, "failed with response:", r, "\nError:", err)
+		log.Warn(fmt.Sprintf("Request URL: %v failed with response: %v Error: %v", r.Request.URL, r, err))
 	})
 
 	c.OnResponse(func(res *colly.Response) {
-		fmt.Println("Visited", res.Request.URL, res.Request.ID, res.Request.Depth)
+		log.Warn(fmt.Sprintf("Visited %v %v %v", res.Request.URL, res.Request.ID, res.Request.Depth))
 		path := fmt.Sprintf("%v/%v", options.Directory, res.Request.URL.Path)
 		dir := filepath.Dir(path)
 		if err := os.MkdirAll(dir, 0755); err != nil {
-			fmt.Println(err)
+			log.Warn(err)
 			return
 		}
 		fp, err := os.Create(path)
 		if err != nil {
-			fmt.Println(err)
+			log.Warn(err)
 			return
 		}
 		if _, err := fp.Write(res.Body); err != nil {
-			fmt.Println(err)
+			log.Warn(err)
 			return
 		}
 		_ = fp.Close()
