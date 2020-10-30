@@ -1,0 +1,24 @@
+namespace: prod
+name: go-crawler-databus
+parallelism: 1
+
+image:
+  repository: registry.cn-beijing.aliyuncs.com/hatlonely/go-crawler-databus
+  tag: 1.0.0
+  pullPolicy: Always
+
+imagePullSecrets:
+  name: hatlonely-pull-secrets
+
+config: |
+  {
+    "producer": {
+      "type": "file",
+      "filename": "stdin"
+    },
+    "consumer": {
+      "type": "file",
+      "filename": "stdout"
+    },
+    "parallel": 1
+  }
