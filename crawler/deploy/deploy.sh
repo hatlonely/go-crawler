@@ -41,8 +41,13 @@ function CreatePullSecretsIfNotExists() {
 }
 
 function Render() {
+    debug="false"
+    if [ "$1" == "--debug" ]; then
+        debug="true"
+    fi
+
     cat > tmp/chart.yaml <<EOF
-debug: false
+debug: ${debug}
 namespace: ${Namespace}
 name: ${Name}
 activeDeadlineSeconds: 86400
@@ -99,11 +104,11 @@ function Help() {
     echo "  sh deploy.sh build"
     echo "  sh deploy.sh sql"
     echo "  sh deploy.sh secret"
-    echo "  sh deploy.sh render"
-    echo "  sh deploy.sh install"
-    echo "  sh deploy.sh upgrade"
+    echo "  sh deploy.sh render [--debug]"
+    echo "  sh deploy.sh install [--debug]"
+    echo "  sh deploy.sh upgrade [--debug]"
     echo "  sh deploy.sh delete"
-    echo "  sh deploy.sh diff"
+    echo "  sh deploy.sh diff [--debug]"
     echo "  sh deploy.sh run"
 }
 
@@ -117,10 +122,10 @@ function main() {
         "build") Build;;
         "sql") SQLTpl;;
         "secret") CreatePullSecretsIfNotExists;;
-        "render") Render;;
-        "install") Render && Install;;
-        "upgrade") Render && Upgrade;;
-        "diff") Render && Diff;;
+        "render") Render "$2";;
+        "install") Render "$2" && Install;;
+        "upgrade") Render "$2" && Upgrade;;
+        "diff") Render "$2" && Diff;;
         "delete") Delete;;
         "run") Run;;
     esac

@@ -1,3 +1,4 @@
+debug: false
 namespace: prod
 name: go-crawler-databus
 activeDeadlineSeconds: 86400
