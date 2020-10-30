@@ -6,6 +6,7 @@ import (
 	"github.com/hatlonely/go-kit/binding"
 	"github.com/hatlonely/go-kit/config"
 	"github.com/hatlonely/go-kit/flag"
+	"github.com/hatlonely/go-kit/logger"
 	"github.com/hatlonely/go-kit/strx"
 
 	"github.com/hatlonely/go-crawler/databus/internal/executor"
@@ -45,7 +46,8 @@ func main() {
 	}
 
 	Must(binding.Bind(&options, flag.Instance(), binding.NewEnvGetter(), cfg))
-	fmt.Println(strx.MustJsonMarshal(options))
+	log := logger.NewLogger(logger.LevelInfo, logger.NewStdoutWriter())
+	log.Info(strx.JsonMarshal(options))
 
 	consumer, err := executor.NewConsumer(cfg.Sub("consumer"))
 	if err != nil {
