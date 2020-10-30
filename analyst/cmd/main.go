@@ -37,13 +37,12 @@ func main() {
 		fmt.Println(Version)
 		return
 	}
-	var cfg *config.Config
-	if options.ConfigPath != "" {
-		var err error
-		cfg, err = config.NewSimpleFileConfig(options.ConfigPath)
-		if err != nil {
-			panic(err)
-		}
+	if options.ConfigPath == "" {
+		options.ConfigPath = "config/go-crawler-analyst.json"
+	}
+	cfg, err := config.NewSimpleFileConfig(options.ConfigPath)
+	if err != nil {
+		panic(err)
 	}
 
 	Must(binding.Bind(&options, flag.Instance(), binding.NewEnvGetter(), cfg))

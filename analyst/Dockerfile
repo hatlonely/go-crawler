@@ -7,4 +7,4 @@ COPY docker/ /var/docker/go-crawler-analyst
 RUN mkdir -p /var/docker/go-crawler-analyst/log
 
 WORKDIR /var/docker/go-crawler-analyst
-CMD [ "bin/analyst", "-c", "config/shicimingju.json" ]
+CMD [ "bin/analyst", "-c", "config/go-crawler-analyst.json" ]
