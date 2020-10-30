@@ -20,6 +20,7 @@ type Options struct {
 	Directory    string `dft:"data"`
 	Parallel     int    `dft:"100"`
 	MaxDepth     int    `dft:"4"`
+	DomainGlob   string
 	Delay        time.Duration
 	AllowDomains []string
 	UserAgent    string
@@ -45,13 +46,12 @@ func main() {
 		fmt.Println(Version)
 		return
 	}
-	var cfg *config.Config
-	if options.ConfigPath != "" {
-		var err error
-		cfg, err = config.NewSimpleFileConfig(options.ConfigPath)
-		if err != nil {
-			panic(err)
-		}
+	if options.ConfigPath == "" {
+		options.ConfigPath = "config/go-crawler-crawler.json"
+	}
+	cfg, err := config.NewSimpleFileConfig(options.ConfigPath)
+	if err != nil {
+		panic(err)
 	}
 
 	Must(binding.Bind(&options, flag.Instance(), binding.NewEnvGetter(), cfg))
@@ -64,7 +64,7 @@ func main() {
 	)
 
 	c.Limit(&colly.LimitRule{
-		DomainGlob:  `*.shicimingju.*`,
+		DomainGlob:  options.DomainGlob,
 		Parallelism: options.Parallel,
 		Delay:       options.Delay,
 	})
@@ -110,8 +110,5 @@ func main() {
 	})
 
 	c.Visit(options.StartPage)
-	//c.Visit("https://www.shicimingju.com/book/sanguoyanyi.html")
-	//c.Visit("https://www.shicimingju.com/book/sanguoyanyi/1.html")
-
 	c.Wait()
 }
