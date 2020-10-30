@@ -6,7 +6,7 @@ import (
 	"github.com/hatlonely/go-kit/binding"
 	"github.com/hatlonely/go-kit/config"
 	"github.com/hatlonely/go-kit/flag"
-	"github.com/hatlonely/go-kit/strex"
+	"github.com/hatlonely/go-kit/strx"
 
 	"github.com/hatlonely/go-crawler/analyst/internal/shicimingju"
 )
@@ -46,7 +46,7 @@ func main() {
 	}
 
 	Must(binding.Bind(&options, flag.Instance(), binding.NewEnvGetter(), cfg))
-	fmt.Println(strex.MustJsonMarshal(options))
+	fmt.Println(strx.MustJsonMarshal(options))
 
 	Must(shicimingju.NewBookAnalystWithOptions(&options.Book).AnalystAndSaveResult())
 	Must(shicimingju.NewShiCiAnalystWithOptions(&options.ShiCi).AnalystAndSaveResult())

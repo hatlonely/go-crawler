@@ -13,7 +13,7 @@ import (
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
-	"github.com/hatlonely/go-kit/strex"
+	"github.com/hatlonely/go-kit/strx"
 )
 
 type BookOptions struct {
@@ -115,10 +115,10 @@ func (a *BookAnalyst) AnalystBookMeta(bookName string) (*BookMeta, error) {
 
 	return &BookMeta{
 		Source:        fmt.Sprintf("/book/%v.html", bookName),
-		Title:         strings.Trim(strings.Trim(strex.FormatSpace(doc.Find("#main_left > div > h1").Text()), "《"), "》"),
-		Dynasty:       strex.FormatSpace(doc.Find("#main_left > div > div:nth-child(2) > p:nth-child(2)").Text()),
-		Author:        strex.FormatSpace(doc.Find("#main_left > div > div:nth-child(2) > p:nth-child(3)").Text()),
-		Brief:         strex.FormatSpace(doc.Find("#main_left > div > div:nth-child(2) > p.des").Text()),
+		Title:         strings.Trim(strings.Trim(strx.FormatSpace(doc.Find("#main_left > div > h1").Text()), "《"), "》"),
+		Dynasty:       strx.FormatSpace(doc.Find("#main_left > div > div:nth-child(2) > p:nth-child(2)").Text()),
+		Author:        strx.FormatSpace(doc.Find("#main_left > div > div:nth-child(2) > p:nth-child(3)").Text()),
+		Brief:         strx.FormatSpace(doc.Find("#main_left > div > div:nth-child(2) > p.des").Text()),
 		DynastyAuthor: doc.Find("#main_left > div > div:nth-child(2) > p:nth-child(1)").Text(),
 	}, nil
 }
@@ -176,7 +176,7 @@ func (a *BookAnalyst) AnalystBookSection(bookName string, section string) (*Book
 	return &BookSection{
 		Source:  fmt.Sprintf("/book/%v/%v", bookName, section),
 		Index:   idx,
-		Section: strex.FormatSpace(doc.Find("#main_left > div.card.bookmark-list > h1").Text()),
+		Section: strx.FormatSpace(doc.Find("#main_left > div.card.bookmark-list > h1").Text()),
 		Content: buf.String(),
 	}, nil
 }

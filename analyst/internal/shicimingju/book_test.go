@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/hatlonely/go-kit/strex"
+	"github.com/hatlonely/go-kit/strx"
 	. "github.com/smartystreets/goconvey/convey"
 )
 
@@ -15,13 +15,13 @@ func TestBookAnalyst(t *testing.T) {
 		{
 			meta, err := a.AnalystBookMeta(bookName)
 			So(err, ShouldBeNil)
-			fmt.Println(strex.MustJsonMarshal(meta))
+			fmt.Println(strx.MustJsonMarshal(meta))
 		}
 
 		{
 			section, err := a.AnalystBookSection(bookName, "2.html")
 			So(err, ShouldBeNil)
-			fmt.Println(strex.MustJsonMarshal(section))
+			fmt.Println(strx.MustJsonMarshal(section))
 			fmt.Println(section.Content)
 		}
 
