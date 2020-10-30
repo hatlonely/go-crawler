@@ -4,9 +4,9 @@ metadata:
   namespace: {{.Values.namespace}}
   name: {{.Values.name}}
 spec:
-  parallelism: {{.Values.parallelism}}
+  parallelism: 1
   completions: 1
-  activeDeadlineSeconds: 1800
+  activeDeadlineSeconds: {{.Values.activeDeadlineSeconds}}
   backoffLimit: 1
   template:
     metadata:
@@ -18,6 +18,12 @@ spec:
         - name: {{.Values.name}}
           imagePullPolicy: {{.Values.image.pullPolicy}}
           image: {{.Values.image.repository}}:{{.Values.image.tag}}
+          {{if .Values.debug}}
+          command:
+            - /bin/bash
+            - -c
+            - "tail -f /dev/null"
+          {{end}}
           volumeMounts:
             - name: {{.Values.name}}-data
               mountPath: /var/docker/{{.Values.name}}/data

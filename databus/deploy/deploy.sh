@@ -66,7 +66,7 @@ function Render() {
     cat > tmp/chart.yaml <<EOF
 namespace: ${Namespace}
 name: ${Name}
-parallelism: 1
+activeDeadlineSeconds: 86400
 
 image:
   repository: ${RegistryServer}/${Image}

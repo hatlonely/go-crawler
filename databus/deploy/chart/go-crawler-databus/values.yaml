@@ -1,6 +1,6 @@
 namespace: prod
 name: go-crawler-databus
-parallelism: 1
+activeDeadlineSeconds: 86400
 
 image:
   repository: registry.cn-beijing.aliyuncs.com/hatlonely/go-crawler-databus
