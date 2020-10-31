@@ -1,0 +1,44 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  namespace: {{.Values.namespace}}
+  name: {{.Values.name}}
+spec:
+  parallelism: 1
+  completions: 1
+  activeDeadlineSeconds: {{.Values.activeDeadlineSeconds}}
+  backoffLimit: 1
+  template:
+    metadata:
+      name: {{.Values.name}}
+    spec:
+      imagePullSecrets:
+        - name: {{.Values.imagePullSecrets.name}}
+      containers:
+        - name: {{.Values.name}}
+          imagePullPolicy: {{.Values.image.pullPolicy}}
+          image: {{.Values.image.repository}}:{{.Values.image.tag}}
+          {{if .Values.debug}}
+          command:
+            - /bin/bash
+            - -c
+            - "tail -f /dev/null"
+          {{end}}
+          volumeMounts:
+            - name: {{.Values.name}}-data
+              mountPath: /var/docker/{{.Values.name}}/data
+            - name: {{.Values.name}}-config
+              mountPath: /var/docker/{{.Values.name}}/config
+      volumes:
+        - name: {{.Values.name}}-data
+          persistentVolumeClaim:
+            claimName: {{.Values.pvc.name}}
+        - name: {{.Values.name}}-config
+          projected:
+            sources:
+              - configMap:
+                  name: {{.Values.name}}
+                  items:
+                    - key: {{.Values.name}}.json
+                      path: {{.Values.name}}.json
+      restartPolicy: OnFailure

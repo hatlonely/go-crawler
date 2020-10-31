@@ -1,0 +1,6 @@
+apiVersion: v2
+name: go-crawler-analyst
+description: crawler analyst helm chart for kubernetes
+type: application
+version: 0.1.0
+appVersion: 1.0.0
