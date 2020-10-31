@@ -41,5 +41,4 @@ image: dockerenv
 	docker exec go-build-env bash -c "cd /data/src/${gituser}/${repository} && make build"
 	docker cp go-build-env:/data/src/${gituser}/${repository}/build/ docker/
 	docker build --tag=hatlonely/${repository}:${version} .
-	docker push hatlonely/${repository}:${version}
 

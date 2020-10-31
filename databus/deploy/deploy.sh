@@ -68,50 +68,10 @@ function Render() {
         debug="true"
     fi
 
-    cat > tmp/chart.yaml <<EOF
-debug: ${debug}
-namespace: ${Namespace}
-name: ${Name}
-activeDeadlineSeconds: 86400
-
-pvc:
-  name: ${PVCName}
-
-image:
-  repository: ${RegistryServer}/${Image}
-  tag: ${Version}
-  pullPolicy: Always
-
-imagePullSecrets:
-  name: ${PullSecrets}
-
-config: |
-  {
-    "producer": {
-      "type": "file",
-      "filename": "data/analyst/www.shicimingju.com/shici.json"
-    },
-    "consumer": {
-      "type": "mysql",
-      "mysql": {
-        "username": "${MysqlUsername}",
-        "password": "${MysqlPassword}",
-        "database": "${MysqlDatabase}",
-        "host": "${MysqlServer}",
-        "port": 3306,
-        "connMaxLifeTime": "60s",
-        "maxIdleConns": 10,
-        "maxOpenConns": 20
-      },
-      "table": "shici",
-      "fields": ["id", "title", "author", "dynasty", "content"],
-      "keyMap": {
-        "id": "@lineno"
-      }
-    },
-    "parallel": 1
-  }
+    eval "cat > tmp/chart.yaml <<EOF
+$(cat "tpl/${ChartTpl}")
 EOF
+"
 }
 
 function Run() {
@@ -149,11 +109,6 @@ function Help() {
 }
 
 function main() {
-    if [ -z "$1" ]; then
-        Help
-        return 0
-    fi
-
     case "$1" in
         "build") Build;;
         "sql") SQLTpl;;
@@ -164,6 +119,7 @@ function main() {
         "diff") Render "$2" && Diff;;
         "delete") Delete;;
         "run") Run;;
+        *) Help;;
     esac
 }
 

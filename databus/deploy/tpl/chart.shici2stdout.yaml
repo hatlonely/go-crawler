@@ -1,0 +1,28 @@
+debug: ${debug}
+namespace: ${Namespace}
+name: ${Name}
+activeDeadlineSeconds: 86400
+
+pvc:
+  name: ${PVCName}
+
+image:
+  repository: ${RegistryServer}/${Image}
+  tag: ${Version}
+  pullPolicy: Always
+
+imagePullSecrets:
+  name: ${PullSecrets}
+
+config: |
+  {
+    "producer": {
+      "type": "file",
+      "filename": "data/analyst/www.shicimingju.com/shici.json"
+    },
+    "consumer": {
+      "type": "file",
+      "filename": "stdout"
+    },
+    "parallel": 1
+  }

@@ -26,25 +26,30 @@ func NewExecutor(producer Producer, consumer Consumer, parallel int) *Executor {
 }
 
 func (e *Executor) Execute() {
-	var wg sync.WaitGroup
-	wg.Add(1)
+	var valWg sync.WaitGroup
+	var errWg sync.WaitGroup
+	valWg.Add(1)
 	go func() {
 		e.producer.Produce(e.vals, e.errs)
-		wg.Done()
+		valWg.Done()
+		close(e.vals)
 	}()
 	for i := 0; i < e.parallel; i++ {
-		wg.Add(1)
+		valWg.Add(1)
 		go func() {
 			e.consumer.Consume(e.vals, e.errs)
-			wg.Done()
+			valWg.Done()
 		}()
 	}
-	wg.Add(1)
+
+	errWg.Add(1)
 	go func() {
 		for err := range e.errs {
 			fmt.Println(err)
 		}
-		wg.Done()
+		errWg.Done()
 	}()
-	wg.Wait()
+	valWg.Wait()
+	close(e.errs)
+	errWg.Wait()
 }
