@@ -2,13 +2,13 @@
 
 Namespace="prod"
 Name="go-crawler-databus"
-RegistryServer={{.registry.server}}
-RegistryUsername={{.registry.username}}
-RegistryPassword={{.registry.password}}
-MysqlServer={{.mysql.server}}
-MysqlRootPassword={{.mysql.rootPassword}}
-MysqlUsername={{.mysql.username}}
-MysqlPassword={{.mysql.password}}
+RegistryServer="{{.registry.server}}"
+RegistryUsername="{{.registry.username}}"
+RegistryPassword="{{.registry.password}}"
+MysqlServer="{{.mysql.server}}"
+MysqlRootPassword="{{.mysql.rootPassword}}"
+MysqlUsername="{{.mysql.username}}"
+MysqlPassword="{{.mysql.password}}"
 MysqlDatabase="ancient"
 PVCName="crawler-pvc"
 PullSecrets="hatlonely-pull-secrets"
