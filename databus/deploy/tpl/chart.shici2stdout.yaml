@@ -7,8 +7,8 @@ pvc:
   name: ${PVCName}
 
 image:
-  repository: ${RegistryServer}/${Image}
-  tag: ${Version}
+  repository: ${RegistryServer}/${ImageRepository}
+  tag: ${ImageTag}
   pullPolicy: Always
 
 imagePullSecrets:
