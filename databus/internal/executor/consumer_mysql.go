@@ -27,16 +27,16 @@ type MysqlConsumerOptions struct {
 	KeyMap map[string]string
 }
 
-func NewMysqlConsumerWithConfig(cfg *config.Config) (*MysqlConsumer, error) {
-	mysqlCli, err := cli.NewMysqlWithConfig(cfg.Sub("mysql"))
+func NewMysqlConsumerWithConfig(cfg *config.Config, opts ...refx.Option) (*MysqlConsumer, error) {
+	mysqlCli, err := cli.NewMysqlWithConfig(cfg.Sub("mysql"), opts...)
 	if err != nil {
 		return nil, err
 	}
-	options := &MysqlConsumerOptions{}
-	if err := cfg.Unmarshal(options, refx.WithCamelName()); err != nil {
+	var options MysqlConsumerOptions
+	if err := cfg.Unmarshal(&options, opts...); err != nil {
 		return nil, err
 	}
-	return NewMysqlConsumerWithOptions(mysqlCli, options)
+	return NewMysqlConsumerWithOptions(mysqlCli, &options)
 }
 
 func NewMysqlConsumerWithOptions(mysqlCli *gorm.DB, options *MysqlConsumerOptions) (*MysqlConsumer, error) {

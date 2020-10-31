@@ -44,6 +44,68 @@ EOF
     kubectl run -n prod -it --rm sql --image=mysql:5.7.30 --restart=Never -- mysql -uroot -hmysql -p${MysqlRootPassword} -e "$(cat tmp/create_table.sql)"
 }
 
+function ESIndex() {
+    cat > tmp/create_index.json <<EOF
+{
+    "settings": {
+        "analysis": {
+            "tokenizer": {
+                "ngram_tokenizer": {
+                    "type": "nGram",
+                    "min_gram": 1,
+                    "max_gram": 10,
+                    "token_chars": [
+                        "letter",
+                        "digit"
+                    ]
+                }
+            },
+            "analyzer": {
+                "ngram_tokenizer_analyzer": {
+                    "type": "custom",
+                    "tokenizer": "ngram_tokenizer",
+                    "filter": [
+                        "lowercase"
+                    ]
+                }
+            }
+        },
+        "max_ngram_diff": "10"
+	},
+	"mappings": {
+		"properties": {
+			"id": {
+				"type": "long"
+			},
+			"title": {
+				"type": "text",
+				"analyzer": "ngram_tokenizer_analyzer",
+				"search_analyzer": "standard"
+			},
+			"author": {
+				"type": "text",
+				"analyzer": "ngram_tokenizer_analyzer",
+				"search_analyzer": "standard"
+			},
+			"dynasty": {
+				"type": "text",
+				"analyzer": "ngram_tokenizer_analyzer",
+				"search_analyzer": "standard"
+			},
+			"content": {
+				"type": "text",
+				"analyzer": "ngram_tokenizer_analyzer",
+				"search_analyzer": "standard"
+			}
+		}
+	}
+}
+EOF
+
+#    curl -XPUT -H "Content-Type: application/json" -d "$(cat tmp/create_index.json)" "127.0.0.1:9200/${ElasticSearchIndex}"
+    kubectl run -n prod -it --rm esindex --image=centos:centos7 --restart=Never -- curl -XPUT -H "Content-Type: application/json" -d "$(cat tmp/create_index.json)" "${ElasticSearchServer}/${ElasticSearchIndex}"
+}
+
 function CreateNamespaceIfNotExists() {
     kubectl get namespaces "${Namespace}" 2>/dev/null 1>&2 && return 0
     kubectl create namespace "${Namespace}" &&
@@ -99,6 +161,7 @@ function Help() {
     echo "example"
     echo "  sh deploy.sh build"
     echo "  sh deploy.sh sql"
+    echo "  sh deploy.sh es"
     echo "  sh deploy.sh secret"
     echo "  sh deploy.sh render [--debug]"
     echo "  sh deploy.sh install [--debug]"
@@ -112,6 +175,7 @@ function main() {
     case "$1" in
         "build") Build;;
         "sql") SQLTpl;;
+        "es") ESIndex;;
         "secret") CreatePullSecretsIfNotExists;;
         "render") Render "$2";;
         "install") Render "$2" && Install;;

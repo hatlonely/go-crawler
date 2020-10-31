@@ -7,6 +7,7 @@ import (
 	"github.com/hatlonely/go-kit/config"
 	"github.com/hatlonely/go-kit/flag"
 	"github.com/hatlonely/go-kit/logger"
+	"github.com/hatlonely/go-kit/refx"
 	"github.com/hatlonely/go-kit/strx"
 
 	"github.com/hatlonely/go-crawler/databus/internal/executor"
@@ -49,11 +50,11 @@ func main() {
 	log := logger.NewLogger(logger.LevelInfo, logger.NewStdoutWriter())
 	log.Info(strx.JsonMarshal(options))
 
-	consumer, err := executor.NewConsumer(cfg.Sub("consumer"))
+	consumer, err := executor.NewConsumerWithConfig(cfg.Sub("consumer"), refx.WithCamelName())
 	if err != nil {
 		panic(err)
 	}
-	producer, err := executor.NewProducer(cfg.Sub("producer"))
+	producer, err := executor.NewProducerWithConfig(cfg.Sub("producer"), refx.WithCamelName())
 	if err != nil {
 		panic(err)
 	}
