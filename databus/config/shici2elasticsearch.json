@@ -1,0 +1,20 @@
+{
+  "producer": {
+    "type": "file",
+    "filename": "stdin"
+  },
+  "consumer": {
+    "type": "elasticsearch",
+    "elasticsearch": {
+      "uri": "http://127.0.0.1:9200"
+    },
+    "index": "shici",
+    "idField": "@lineno",
+    "timeout": "5s",
+    "fields": ["id", "title", "author", "dynasty", "content"],
+    "keyMap": {
+      "id": "@lineno"
+    }
+  },
+  "parallel": 1
+}
